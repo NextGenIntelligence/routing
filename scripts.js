@@ -186,15 +186,4 @@ $(function() {
     ].join(''));
     create_marker(datum.geoJson);
   });
-
-  // DEFAULT VALUES
-  if ($('#lon').val()=='' && $('#lat').val()=='') {
-    setCoords();
-  }
-  if ($_GET!=null && $_GET.sort=='on') {
-    $('#sort').prop('checked', true);
-  }
-  if ($_GET!=null && $_GET.filter=='on') {
-    $('#filter').prop('checked', true);
-  }
 });
