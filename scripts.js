@@ -74,6 +74,35 @@ function getAdmin(obj) {
   return admin.join(", ");
 }
 
+PRECISION = 6;
+//decode compressed route geometry
+var _decode_geometry= function(encoded, precision) {
+  precision = Math.pow(10, -precision);
+  var len = encoded.length, index=0, lat=0, lng = 0, array = [];
+  while (index < len) {
+    var b, shift = 0, result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    var dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    var dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+    //array.push( {lat: lat * precision, lng: lng * precision} );
+    array.push( [lat * precision, lng * precision] );
+  }
+  return array;
+}
+
 $(function() {
   // MAP SETUP
   map = L.mapbox.map('map', 'randyme.gajlngfe').setView([40.73035,-73.98639], 15);
@@ -130,10 +159,10 @@ $(function() {
       $.ajax({
         type:'GET',
         dataType:"json",
-        url: 'http://api-osrm-test.mapzen.com/car/viaroute?' + vroute_query_string,
+        url: 'http://api-osrm-test.mapzen.com/'+ $_GET.transitMode +'/viaroute?' + vroute_query_string,
         success: function(data) {
-          console.log(data);
-          create_route(data.via_points)
+          var geometry_points = _decode_geometry(data.route_geometry, PRECISION );
+          create_route(geometry_points)
         }
       })
     });
@@ -186,4 +215,13 @@ $(function() {
     ].join(''));
     create_marker(datum.geoJson);
   });
+  if ($_GET!=null && $_GET.transitMode=='car') {
+    $('#car').prop('checked', true);
+  }
+  if ($_GET!=null && $_GET.transitMode=='bicycle') {
+    $('#bicycle').prop('checked', true);
+  }
+  if ($_GET!=null && $_GET.transitMode=='foot') {
+    $('#foot').prop('checked', true);
+  }
 });

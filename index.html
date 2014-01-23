@@ -31,6 +31,23 @@
             <input type="search" name="start" class="form-control typeahead" id="start" placeholder="Starting Point">
             <div class="headroom"></div>
             <input type="search" name="end" class="form-control typeahead" id="end" placeholder="Destination">
+            <div class="headroom">
+              <div class="radio">
+                <label>
+                  <input type="radio" name="transitMode" id="car" value="car" checked> Drive
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="transitMode" id="bicycle" value="bicycle"> Bike
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="transitMode" id="foot" value="foot"> Walk
+                </label>
+              </div>
+            </div>
             <div class="headroom footroom">
               <input type="submit" class="btn btn-info" type="button" value="Go!" />
             </div>
