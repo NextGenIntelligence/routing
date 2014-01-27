@@ -159,7 +159,7 @@ $(function() {
       $.ajax({
         type:'GET',
         dataType:"json",
-        url: 'http://api-osrm-test.mapzen.com/'+ $_GET.transitMode +'/viaroute?' + vroute_query_string,
+        url: 'http://localhost:5000/viaroute?' + vroute_query_string,
         success: function(data) {
           var geometry_points = _decode_geometry(data.route_geometry, PRECISION );
           create_route(geometry_points)
