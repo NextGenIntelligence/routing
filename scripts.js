@@ -159,7 +159,7 @@ $(function() {
       $.ajax({
         type:'GET',
         dataType:"json",
-        url: 'http://api-osrm-test.mapzen.com/'+ $_GET.transitMode +'/viaroute?' + vroute_query_string,
+        url: 'http://osrm.test.mapzen.com/'+ $_GET.transitMode +'/viaroute?' + vroute_query_string,
         success: function(data) {
           var geometry_points = _decode_geometry(data.route_geometry, PRECISION );
           create_route(geometry_points)
@@ -183,7 +183,7 @@ $(function() {
   $('.typeahead').typeahead([{
     name: 'suggestions',
     remote: {
-      url: 'http://api-pelias-test.mapzen.com/suggest?size=10&query=%QUERY',
+      url: 'http://pelias.test.mapzen.com/suggest?size=10&query=%QUERY',
       filter: function (geojsonResponse) {
         var arr = [];
         var features = geojsonResponse.features;
