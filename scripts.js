@@ -128,7 +128,7 @@ $(function() {
       $.ajax({
         type: 'GET',
         dataType: "json",
-        url: 'http://api-pelias-test.mapzen.com' + query_string,
+        url: 'http://pelias.test.mapzen.com' + query_string,
         success: function(geoJson) {
           create_marker(geoJson.features[0]);
         }
