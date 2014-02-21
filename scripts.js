@@ -143,27 +143,21 @@ $(function() {
       $('#end').val($_GET.end);
       putMarkerOnMap($_GET.end)
     }
-    var create_route = function(points_to_plot) {
-      var plottedPolyline = L.Polyline.Plotter(points_to_plot,{
-          weight: 5
-      }).addTo(map);
-      var all_points = [];
-      all_points.push(markers[0]._latlng);
-      all_points.push(points_to_plot);
-      all_points.push(markers[1]._latlng);
-      map.fitBounds(all_points);
-    }
     $(document).on("routing:ready", function(event,mks){
       // Routing
-      var vroute_query_string = "loc="+mks[0]._latlng.lat+"%2C"+mks[0]._latlng.lng+"&loc="+mks[1]._latlng.lat+"%2C"+mks[1]._latlng.lng+"&instructions=true&z=16";
-      $.ajax({
-        type:'GET',
-        dataType:"json",
-        url: 'http://osrm.test.mapzen.com/'+ $_GET.transitMode +'/viaroute?' + vroute_query_string,
-        success: function(data) {
-          var geometry_points = _decode_geometry(data.route_geometry, PRECISION );
-          create_route(geometry_points)
-        }
+      remove_markers();
+      L.Routing.control({
+        waypoints: [
+          L.latLng(mks[0]._latlng.lat, mks[0]._latlng.lng),
+          L.latLng(mks[1]._latlng.lat, mks[1]._latlng.lng)
+        ],
+        geocoder: null,
+        transitmode: $_GET.transitMode
+      }).addTo(map);
+      //hack to display instructions on the page
+      $(document).on("routeselected:done", function(){
+        $("#route_instructions").html($(".leaflet-routing-container"));
+        console.log("now");
       })
     });
   }
