@@ -114,14 +114,16 @@ function getAdmin(obj) {
 $(document).ready(function() {
     $('#generate-button').click(function() {
         $('#generate-button').hide();
+        var file = prompt("Pick a name for the file that will be accessible in the command line",
+            $('#start').val() + "to " + $('#end').val());
         $.ajax({
             type: 'GET',
             url: 'http://127.0.0.1:1337/generateGPX',
             data: {
-                location1: coordinates[1],
-                location2: coordinates[0],
+                location1: coordinates[0],
+                location2: coordinates[1],
                 transportMethod: $('input:radio:checked').val(),
-                filename: $('#start').val() + " to " + $('#end').val()
+                filename: file
             },
             success: function() {}
         });
@@ -159,6 +161,7 @@ var _decode_geometry = function(encoded, precision) {
         //array.push( {lat: lat * precision, lng: lng * precision} );
         array.push([lat * precision, lng * precision]);
     }
+    console.log(array);
     return array;
 }
 
