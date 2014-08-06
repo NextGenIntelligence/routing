@@ -15,8 +15,8 @@ ga('send', 'pageview');
 
 var map, activeResult, browser_lat, browser_lng;
 var markers = [];
-var coordinates = [];
 var searchResults = [];
+var control;
 
 function setCoords() {
     var center = map.getCenter();
@@ -40,7 +40,6 @@ function create_marker(obj) {
     console.log(obj);
     var lonlat = [obj.geometry.coordinates[1], obj.geometry.coordinates[0]];
     var type = obj.properties.type;
-    coordinates.push(lonlat);
     marker = L.marker(lonlat);
     marker.bindPopup(getPopupText(obj));
     markers.push(marker);
@@ -50,6 +49,7 @@ function create_marker(obj) {
     if (markers.length == 2) {
         $(document).trigger("routing:ready", [markers]);
     }
+    console.log(markers);
 }
 
 function getPopupText(obj) {
@@ -111,22 +111,15 @@ function getAdmin(obj) {
     }
     return admin.join(", ");
 }
+
 $(document).ready(function() {
     $('#generate-button').click(function() {
-        $('#generate-button').hide();
-        var file = prompt("Pick a name for the file that will be accessible in the command line",
-            $('#start').val() + "to " + $('#end').val());
-        $.ajax({
-            type: 'GET',
-            url: 'http://127.0.0.1:1337/generateGPX',
-            data: {
-                location1: coordinates[0],
-                location2: coordinates[1],
-                transportMethod: $('input:radio:checked').val(),
-                filename: file
-            },
-            success: function() {}
-        });
+        var filename = prompt("Pick a name for the gpx file. It will be automatically downloaded when ready.",
+            $('#start').val() + " to " + $('#end').val());
+        if (filename != null) {
+            startGPXWorker(control._line._route.geometry, filename);
+            $('#generate-button').hide();
+        }
     });
 });
 
@@ -150,7 +143,6 @@ var _decode_geometry = function(encoded, precision) {
         var dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
         lat += dlat;
         shift = 0;
-        result = 0;
         do {
             b = encoded.charCodeAt(index++) - 63;
             result |= (b & 0x1f) << shift;
@@ -161,7 +153,6 @@ var _decode_geometry = function(encoded, precision) {
         //array.push( {lat: lat * precision, lng: lng * precision} );
         array.push([lat * precision, lng * precision]);
     }
-    console.log(array);
     return array;
 }
 
@@ -205,23 +196,25 @@ $(function() {
             $('#end').val($_GET.end);
             putMarkerOnMap($_GET.end)
         }
+
         $(document).on("routing:ready", function(event, mks) {
             // Routing
             remove_markers();
-            L.Routing.control({
+            control = L.Routing.control({
                 waypoints: [
                     L.latLng(mks[0]._latlng.lat, mks[0]._latlng.lng),
                     L.latLng(mks[1]._latlng.lat, mks[1]._latlng.lng)
                 ],
                 geocoder: null,
                 transitmode: $_GET.transitMode
-            }).addTo(map);
+            });
+            control.addTo(map);
             //hack to display instructions on the page
             $(document).on("routeselected:done", function() {
                 $("#route_instructions").html($(".leaflet-routing-container"));
-                console.log("now");
             })
         });
+
     } else {
         // CURRENT LOCATION
         if (navigator.geolocation) {
@@ -280,3 +273,18 @@ $(function() {
         $('#foot').prop('checked', true);
     }
 });
+
+function startGPXWorker(coordinates, filename) {
+    var worker = new Worker("gpxWorker.js");
+    worker.postMessage(coordinates);
+    worker.onmessage = function(oEvent) {
+        generateDownload(oEvent.data.toString(), filename);
+    }
+}
+
+function generateDownload(gpxString, filename) {
+    var blob = new Blob([gpxString], {
+        type: "text/plain;charset=utf-8;",
+    });
+    saveAs(blob, filename + ".gpx");
+}
