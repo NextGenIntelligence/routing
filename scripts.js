@@ -37,7 +37,6 @@ function remove_markers() {
 }
 
 function create_marker(obj) {
-    console.log(obj);
     var lonlat = [obj.geometry.coordinates[1], obj.geometry.coordinates[0]];
     var type = obj.properties.type;
     marker = L.marker(lonlat);
@@ -49,7 +48,6 @@ function create_marker(obj) {
     if (markers.length == 2) {
         $(document).trigger("routing:ready", [markers]);
     }
-    console.log(markers);
 }
 
 function getPopupText(obj) {

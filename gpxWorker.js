@@ -44,8 +44,6 @@ function writeToGPX(tracename, trace) {
 
     contents = header + tracename + "<\/name>" + "<trkseg>"
 
-    console.log("length");
-    console.log(trace.length);
     trace.forEach(function(entry) {
         contents += createGPXElement(entry[0], entry[1]);
     });
