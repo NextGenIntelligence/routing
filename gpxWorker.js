@@ -9,7 +9,7 @@ function findFollowingPointOnLine(coordinates) {
     var point1 = new LatLon(lat1, lon1);
 
     var midpoint;
-    if (point0.distanceTo(point1) * 1000 > 10) {
+    if (point0.distanceTo(point1) * 1000 > 5) {
         midpoint = point0.midpointTo(point1)
         findFollowingPointOnLine(new Array([point0.lat, point0.lon], [midpoint.lat, midpoint.lon]));
     } else {
@@ -28,7 +28,7 @@ function findAllPoints(coordinates) {
         var lon1 = coordinates[i][1];
         var point1 = new LatLon(lat1, lon1);
 
-        while ((point0.distanceTo(point1) * 1000) > 1) {
+        while ((point0.distanceTo(point1) * 1000) > 5) {
             point0 = new LatLon(trackingPoints[trackingPoints.length - 1][0],
                 trackingPoints[trackingPoints.length - 1][1]);
             findFollowingPointOnLine(new Array(new Array(point0.lat, point0.lon), new Array(lat1, lon1)));
