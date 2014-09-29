@@ -56,14 +56,16 @@
 				}],
 			    i;
 
-			for (i = 0; i < response.alternative_geometries.length; i++) {
-				alts.push({
-					name: response.alternative_names[i],
-					geometry: this._decode(response.alternative_geometries[i], this.options.geometryPrecision),
-					instructions: response.alternative_instructions[i],
-					summary: response.alternative_summaries[i],
-					waypoints: response.via_points
-				})
+			if (response.alternative_geometries) {
+				for (i = 0; i < response.alternative_geometries.length; i++) {
+					alts.push({
+						name: response.alternative_names[i],
+						geometry: this._decode(response.alternative_geometries[i], this.options.geometryPrecision),
+						instructions: response.alternative_instructions[i],
+						summary: response.alternative_summaries[i],
+						waypoints: response.via_points
+					})
+				}	
 			}
 
 			this._saveHintData(response, waypoints);

@@ -41,13 +41,13 @@ function create_marker(obj) {
 function getPopupText(obj) {
   var text = [];
   if (obj.properties.name != null) { text.push('<b>Name:</b> '+obj.properties.name) }
-  if (obj.properties.neighborhood_name != null) { text.push('<b>Neighborhood:</b> '+obj.properties.neighborhood_name) }
-  if (obj.properties.locality_name != null) { text.push('<b>Locality:</b> '+obj.properties.locality_name) }
-  if (obj.properties.local_admin_name != null) { text.push('<b>Local admin:</b> '+obj.properties.local_admin_name) }
-  if (obj.properties.admin2_name != null) { text.push('<b>Admin2:</b> '+obj.properties.admin2_name) }
-  if (obj.properties.admin1_name != null) { text.push('<b>Admin1:</b> '+obj.properties.admin1_name) }
+  if (obj.properties.neighborhood_name != null) { text.push('<b>Neighborhood:</b> '+obj.properties.neighborhood) }
+  if (obj.properties.locality != null) { text.push('<b>Locality:</b> '+obj.properties.locality) }
+  if (obj.properties.local_admin != null) { text.push('<b>Local admin:</b> '+obj.properties.local_admin) }
+  if (obj.properties.admin2 != null) { text.push('<b>Admin2:</b> '+obj.properties.admin2) }
+  if (obj.properties.admin1 != null) { text.push('<b>Admin1:</b> '+obj.properties.admin1) }
   if (obj.properties.admin1_abbr != null) { text.push('<b>Admin1 abbr:</b> '+obj.properties.admin1_abbr) }
-  if (obj.properties.country_name != null) { text.push('<b>Country:</b> '+obj.properties.country_name) }
+  if (obj.properties.country != null) { text.push('<b>Country:</b> '+obj.properties.country) }
   if (obj.properties.country_code != null) { text.push('<b>Country code:</b> '+obj.properties.country_code) }
   return '<p>' + text.join('<br/>') + '</p>';
 }
@@ -59,8 +59,10 @@ function getDescription(type) {
   else if (type == 'geoname') {
     return "Geoname";
   }
-  else {
+  else if (type == 'quattroshapes'){
     return "Quattroshapes: " + type.replace('_', ' ');
+  } else {
+    return "";
   }
 }
 
@@ -118,17 +120,16 @@ $(function() {
       $_GET[decode(arguments[1])] = decode(arguments[2]);
     });
     var putMarkerOnMap = function(query) {
-      var query_string = '/search?query=' + query;
-      if ($_GET.sort=='on') {
-        query_string += '&center='+$_GET.sort_ll;
-      }
-      if ($_GET.filter=='on') {
-        query_string += '&viewbox='+$_GET.filter_bb;
-      }
+      var query_string = '/search?input=' + query;
+      var center = map.getCenter();
+      var lat = center.lat;
+      var lon = center.lng;
+      query_string += '&lat='+lat+'&lon='+lon;
+      
       $.ajax({
         type: 'GET',
         dataType: "json",
-        url: 'http://pelias.test.mapzen.com' + query_string,
+        url: 'http://pelias.mapzen.com' + query_string,
         success: function(geoJson) {
           create_marker(geoJson.features[0]);
         }
@@ -177,7 +178,7 @@ $(function() {
   $('.typeahead').typeahead([{
     name: 'suggestions',
     remote: {
-      url: 'http://pelias.test.mapzen.com/suggest?size=10&query=%QUERY',
+      url: 'http://pelias.mapzen.com/search?size=10&input=%QUERY&lat='+map.getBounds().getCenter().lat+'&lon='+map.getBounds().getCenter().lng,
       filter: function (geojsonResponse) {
         var arr = [];
         var features = geojsonResponse.features;
@@ -185,9 +186,9 @@ $(function() {
           if (geojsonResponse.features.hasOwnProperty(key)) {
             obj = geojsonResponse.features[key];
             arr.push({
-              value: obj.properties.name,
-              desc: getDescription(obj.properties.type),
-              type: obj.properties.type,
+              value: obj.properties.text,
+              // desc: getDescription(obj.properties.type),
+              // type: obj.properties.type,
               geoJson: obj
             });
           }
