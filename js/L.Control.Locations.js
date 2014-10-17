@@ -44,7 +44,7 @@ L.Control.Locations = L.Control.extend({
         this._link.href = '#';
         this._link.title = this.options.strings.title;
         this._icon = L.DomUtil.create('img', 'ghosts', this._link);
-        this._icon.src = '../js/images/slimer.png';
+        this._icon.src = './js/images/slimer.png';
         this._list = L.DomUtil.create('ul', 'locations shortcuts hidden', container);
         
         var markers = [];
