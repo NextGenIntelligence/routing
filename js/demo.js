@@ -95,16 +95,18 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (ghostbusters > 0) {
       resetGhostBusters();
     }
-    $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], '', 'search');
-    ghostbusters++;
-    L.Routing.control({
-      waypoints: [
-        L.latLng(ghostLocation.lat, ghostLocation.lon),
-        L.latLng(geo.lat, geo.lon)
-      ],
-      geocoder: null,
-      transitmode: 'foot'
-    }).addTo(map);
+    if (ghostLocation) {
+      $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], '', 'search');
+      ghostbusters++;
+      L.Routing.control({
+        waypoints: [
+          L.latLng(ghostLocation.lat, ghostLocation.lon),
+          L.latLng(geo.lat, geo.lon)
+        ],
+        geocoder: null,
+        transitmode: 'foot'
+      }).addTo(map);
+    }
   
   });
 
