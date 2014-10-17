@@ -41,13 +41,13 @@ function create_marker(obj) {
 function getPopupText(obj) {
   var text = [];
   if (obj.properties.name != null) { text.push('<b>Name:</b> '+obj.properties.name) }
-  if (obj.properties.neighborhood_name != null) { text.push('<b>Neighborhood:</b> '+obj.properties.neighborhood_name) }
-  if (obj.properties.locality_name != null) { text.push('<b>Locality:</b> '+obj.properties.locality_name) }
-  if (obj.properties.local_admin_name != null) { text.push('<b>Local admin:</b> '+obj.properties.local_admin_name) }
-  if (obj.properties.admin2_name != null) { text.push('<b>Admin2:</b> '+obj.properties.admin2_name) }
-  if (obj.properties.admin1_name != null) { text.push('<b>Admin1:</b> '+obj.properties.admin1_name) }
+  if (obj.properties.neighborhood_name != null) { text.push('<b>Neighborhood:</b> '+obj.properties.neighborhood) }
+  if (obj.properties.locality != null) { text.push('<b>Locality:</b> '+obj.properties.locality) }
+  if (obj.properties.local_admin != null) { text.push('<b>Local admin:</b> '+obj.properties.local_admin) }
+  if (obj.properties.admin2 != null) { text.push('<b>Admin2:</b> '+obj.properties.admin2) }
+  if (obj.properties.admin1 != null) { text.push('<b>Admin1:</b> '+obj.properties.admin1) }
   if (obj.properties.admin1_abbr != null) { text.push('<b>Admin1 abbr:</b> '+obj.properties.admin1_abbr) }
-  if (obj.properties.country_name != null) { text.push('<b>Country:</b> '+obj.properties.country_name) }
+  if (obj.properties.country != null) { text.push('<b>Country:</b> '+obj.properties.country) }
   if (obj.properties.country_code != null) { text.push('<b>Country code:</b> '+obj.properties.country_code) }
   return '<p>' + text.join('<br/>') + '</p>';
 }
@@ -59,8 +59,10 @@ function getDescription(type) {
   else if (type == 'geoname') {
     return "Geoname";
   }
-  else {
+  else if (type == 'quattroshapes'){
     return "Quattroshapes: " + type.replace('_', ' ');
+  } else {
+    return "";
   }
 }
 
@@ -72,6 +74,35 @@ function getAdmin(obj) {
   else if (obj.admin2_name!=null) { admin.push(obj.admin2_name) }
   if (obj.admin1_abbr!=null) { admin.push(obj.admin1_abbr) }
   return admin.join(", ");
+}
+
+PRECISION = 6;
+//decode compressed route geometry
+var _decode_geometry= function(encoded, precision) {
+  precision = Math.pow(10, -precision);
+  var len = encoded.length, index=0, lat=0, lng = 0, array = [];
+  while (index < len) {
+    var b, shift = 0, result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    var dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    var dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+    //array.push( {lat: lat * precision, lng: lng * precision} );
+    array.push( [lat * precision, lng * precision] );
+  }
+  return array;
 }
 
 $(function() {
@@ -89,17 +120,16 @@ $(function() {
       $_GET[decode(arguments[1])] = decode(arguments[2]);
     });
     var putMarkerOnMap = function(query) {
-      var query_string = '/search?query=' + query;
-      if ($_GET.sort=='on') {
-        query_string += '&center='+$_GET.sort_ll;
-      }
-      if ($_GET.filter=='on') {
-        query_string += '&viewbox='+$_GET.filter_bb;
-      }
+      var query_string = '/search?input=' + query;
+      var center = map.getCenter();
+      var lat = center.lat;
+      var lon = center.lng;
+      query_string += '&lat='+lat+'&lon='+lon;
+      
       $.ajax({
         type: 'GET',
         dataType: "json",
-        url: 'http://api-pelias-test.mapzen.com' + query_string,
+        url: 'http://pelias.mapzen.com' + query_string,
         success: function(geoJson) {
           create_marker(geoJson.features[0]);
         }
@@ -114,27 +144,21 @@ $(function() {
       $('#end').val($_GET.end);
       putMarkerOnMap($_GET.end)
     }
-    var create_route = function(points_to_plot) {
-      var plottedPolyline = L.Polyline.Plotter(points_to_plot,{
-          weight: 5
-      }).addTo(map);
-      var all_points = [];
-      all_points.push(markers[0]._latlng);
-      all_points.push(points_to_plot);
-      all_points.push(markers[1]._latlng);
-      map.fitBounds(all_points);
-    }
     $(document).on("routing:ready", function(event,mks){
       // Routing
-      var vroute_query_string = "loc="+mks[0]._latlng.lat+"%2C"+mks[0]._latlng.lng+"&loc="+mks[1]._latlng.lat+"%2C"+mks[1]._latlng.lng+"&instructions=true&z=16";
-      $.ajax({
-        type:'GET',
-        dataType:"json",
-        url: 'http://api-osrm-test.mapzen.com/car/viaroute?' + vroute_query_string,
-        success: function(data) {
-          console.log(data);
-          create_route(data.via_points)
-        }
+      remove_markers();
+      L.Routing.control({
+        waypoints: [
+          L.latLng(mks[0]._latlng.lat, mks[0]._latlng.lng),
+          L.latLng(mks[1]._latlng.lat, mks[1]._latlng.lng)
+        ],
+        geocoder: null,
+        transitmode: $_GET.transitMode
+      }).addTo(map);
+      //hack to display instructions on the page
+      $(document).on("routeselected:done", function(){
+        $("#route_instructions").html($(".leaflet-routing-container"));
+        console.log("now");
       })
     });
   }
@@ -154,7 +178,7 @@ $(function() {
   $('.typeahead').typeahead([{
     name: 'suggestions',
     remote: {
-      url: 'http://api-pelias-test.mapzen.com/suggest?size=10&query=%QUERY',
+      url: 'http://pelias.mapzen.com/search?size=10&input=%QUERY&lat='+map.getBounds().getCenter().lat+'&lon='+map.getBounds().getCenter().lng,
       filter: function (geojsonResponse) {
         var arr = [];
         var features = geojsonResponse.features;
@@ -162,9 +186,9 @@ $(function() {
           if (geojsonResponse.features.hasOwnProperty(key)) {
             obj = geojsonResponse.features[key];
             arr.push({
-              value: obj.properties.name,
-              desc: getDescription(obj.properties.type),
-              type: obj.properties.type,
+              value: obj.properties.text,
+              // desc: getDescription(obj.properties.type),
+              // type: obj.properties.type,
               geoJson: obj
             });
           }
@@ -186,15 +210,13 @@ $(function() {
     ].join(''));
     create_marker(datum.geoJson);
   });
-
-  // DEFAULT VALUES
-  if ($('#lon').val()=='' && $('#lat').val()=='') {
-    setCoords();
+  if ($_GET!=null && $_GET.transitMode=='car') {
+    $('#car').prop('checked', true);
   }
-  if ($_GET!=null && $_GET.sort=='on') {
-    $('#sort').prop('checked', true);
+  if ($_GET!=null && $_GET.transitMode=='bicycle') {
+    $('#bicycle').prop('checked', true);
   }
-  if ($_GET!=null && $_GET.filter=='on') {
-    $('#filter').prop('checked', true);
+  if ($_GET!=null && $_GET.transitMode=='foot') {
+    $('#foot').prop('checked', true);
   }
 });
