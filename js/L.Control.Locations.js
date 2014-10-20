@@ -9,13 +9,13 @@ L.Control.Locations = L.Control.extend({
         position: 'topleft',
         icon: 'glyphicon-th-list glyphicon',
         locations: [
-            {'loc': [-73.98223400115967,40.75314146550602], 'zoom': 12, 'name': 'NYPL'},
-            {'loc': [-73.9818263053894,40.76812671399359], 'zoom': 12, 'name': 'STAY PUFT'},
-            {'loc': [-73.9791065454483,40.77227875282056], 'zoom': 12, 'name': 'ZUUL'},
+            {'loc': [-73.98223400115967,40.75314146550602], 'zoom': 12, 'name': 'New York Public Library'},
+            {'loc': [-73.9818263053894,40.76812671399359], 'zoom': 12, 'name': 'Columbus Circle'},
+            {'loc': [-73.9791065454483,40.77227875282056], 'zoom': 12, 'name': '55 Central Park West'},
             {'loc': [-74.00659918785095,40.71963998768315], 'zoom': 12, 'name': 'Firehouse'}
         ],
         strings: {
-            title: "Show me other locations"
+            title: "SPOOKY Locations"
         }
     },
 
