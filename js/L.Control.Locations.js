@@ -15,8 +15,7 @@ L.Control.Locations = L.Control.extend({
             {'loc': [-74.00659918785095,40.71963998768315], 'zoom': 12, 'name': 'Firehouse'}
         ],
         strings: {
-            title: "SPOOKY Locations",
-            transit: "Ghost Buster"
+            title: "SPOOKY Locations"
         }
     },
 
@@ -54,10 +53,6 @@ L.Control.Locations = L.Control.extend({
         $(document).trigger('ghost-alert', [locs]);
     },
 
-    trigger_ghost_buster: function(mode) {
-        $(document).trigger('ghost-buster-alert', [mode]);
-    },
-
     onAdd: function (map) {
         var container = L.DomUtil.create('div',
             'leaflet-control-locations leaflet-bar leaflet-control');
@@ -68,33 +63,6 @@ L.Control.Locations = L.Control.extend({
         this._layer.addTo(map);
 
         this._container = container;
-
-        // ghost busters
-        for (key in this.options.ghostbuster_icons) {
-            var icon = this.options.ghostbuster_icons[key];
-            this._transit_link = L.DomUtil.create('a', 'leaflet-bar-part leaflet-bar-part-single', container);
-            this._transit_link.href = '#';
-            this._transit_link.title = this.options.strings.transit + (key === 'foot' ? ' on ' : ' on a ') + key;
-            this._transit_link.setAttribute('class', key === 'foot' ? 'busting' : '');
-            this._transit_link.setAttribute('data-ghost-buster-mode', key)
-            this._transit_icon = L.DomUtil.create('img', 'ghosts', this._transit_link);
-            this._transit_icon.src = icon;
-            L.DomEvent
-            .on(this._transit_link, 'click', L.DomEvent.stopPropagation)
-            .on(this._transit_link, 'click', L.DomEvent.preventDefault)
-            .on(this._transit_link, 'click', function() {
-                var is_busting = this.getAttribute('class') === 'busting';
-                if (!is_busting) {
-                    $('.busting').removeClass('busting');
-                    this.setAttribute('class', 'busting');
-                    self.trigger_ghost_buster(this.getAttribute('data-ghost-buster-mode'));
-                }
-                
-            })
-            .on(this._transit_link, 'dblclick', L.DomEvent.stopPropagation);
-        }
-        // default ghost buster on foot
-        self.trigger_ghost_buster('foot');
 
         // ghosts
         this._link = L.DomUtil.create('a', 'leaflet-bar-part leaflet-bar-part-single', container);

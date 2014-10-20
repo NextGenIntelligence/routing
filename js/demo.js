@@ -64,7 +64,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   }).addTo(map);
   new L.Control.Zoom({ position: 'topright' }).addTo(map);
   L.control.locate({ position: 'topright', keepCurrentZoomLevel: true }).addTo(map);
-  L.control.locations({ position: 'topright', keepCurrentZoomLevel: true, ghostIcon: ghostIcon, map: map, ghostbuster_icons: ghostbuster_icons }).addTo(map);
+  L.control.busters({ position: 'topright', keepCurrentZoomLevel: true, map:map, ghostbuster_icons: ghostbuster_icons }).addTo(map);
+  L.control.locations({ position: 'topright', keepCurrentZoomLevel: true, ghostIcon: ghostIcon, map: map }).addTo(map);
+  
 
   // Set up the hash
   var hash = new L.Hash(map);
