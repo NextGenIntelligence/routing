@@ -29,7 +29,7 @@ L.Control.Busters = L.Control.extend({
 
     onAdd: function (map) {
         var container = L.DomUtil.create('div',
-            'leaflet-control-locations leaflet-bar leaflet-control');
+            'leaflet-control-busters leaflet-bar leaflet-control');
 
         var self = this;
         
