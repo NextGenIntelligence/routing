@@ -83,6 +83,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   
   var resetGhostBusters = function() {
     $('svg').html('');
+    $('.leaflet-routing-container.leaflet-control').remove();
     remove_markers();
     ghostbusters = 0;
   };
@@ -137,12 +138,6 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     var time = td.time,
         distance = td.distance;
     console.log(time) //not sure what to do with this right now
-  })
-
-  // faking a search when query params are present
-  var hash_query  = hash_params ? hash_params.q : false;
-  if (hash_query){
-    $scope.keyPressed({ 'which': 13});
-  }
+  });
     
 })
