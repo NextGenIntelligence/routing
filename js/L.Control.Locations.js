@@ -27,6 +27,30 @@ L.Control.Locations = L.Control.extend({
                 this.options[i] = options[i];
             }
         }
+        this.ghost_markers = {};
+        this.ghost_locations = {};
+        
+        var that = this;
+        this.options.locations.forEach( function(gLoc) {
+            var geo = [Number(gLoc.loc[0]).toFixed(7), Number(gLoc.loc[1]).toFixed(7)].reverse();
+            var marker = new L.marker(geo, {icon: that.options.ghostIcon}).bindPopup(gLoc.name);
+            that.options.map.addLayer(marker);
+            that.ghost_markers[gLoc.name] = marker;
+            that.ghost_locations[gLoc.name] = {lat: geo[0], lon: geo[1]};  
+        });
+        window.setTimeout(function(){
+            that.trigger_spooky();    
+        }, 1000);
+        
+    },
+
+    trigger_spooky: function() {
+        var locs  = [];
+        var glocations = this.ghost_locations;
+        for (loc in glocations) {
+            locs.push({lat: glocations[loc].lat, lon: glocations[loc].lon })
+        }
+        $(document).trigger('ghost-alert', [locs]);
     },
 
     onAdd: function (map) {
@@ -49,12 +73,17 @@ L.Control.Locations = L.Control.extend({
         
         var markers = [];
 
-        var remove_markers = function(){
-          for (i=0; i<markers.length; i++) {
-            map.removeLayer(markers[i]);
-          }
-          markers = [];
-        }
+        var remove_marker = function(s, name){
+          s.ghost_markers[name].setOpacity(0);
+          delete s.ghost_locations[name];
+          s.trigger_spooky();
+        };
+
+        var add_marker = function(s, geo, name){
+          s.ghost_markers[name].setOpacity(1);
+          s.ghost_locations[name] = {lat: geo[1], lon: geo[0]};
+          s.trigger_spooky();
+        };
         
         var ghostIcon = this.options.ghostIcon;
 
@@ -63,21 +92,29 @@ L.Control.Locations = L.Control.extend({
             var li = L.DomUtil.create('li', '', this._list);
             var link = L.DomUtil.create('a', '', li);
             link.setAttribute('data-loc', $this.loc);
+            link.setAttribute('class', 'haunting');
+            link.setAttribute('data-name', $this.name);
             link.setAttribute('data-zoom', $this.zoom);
+            link.setAttribute('data-haunting', 'true');
             link.innerHTML = $this.name;
             L.DomEvent
                 .on(link, 'click', L.DomEvent.stopPropagation)
                 .on(link, 'click', L.DomEvent.preventDefault)
                 .on(link, 'click', function() {
-                    remove_markers();
                     var loc = this.getAttribute('data-loc').split(",");
-                    var zoom = this.getAttribute('data-zoom');
                     var geo = [Number(loc[0]).toFixed(7), Number(loc[1]).toFixed(7)].reverse();
-                    map.setView(geo, zoom);
-                    var marker = new L.marker(geo, {icon: ghostIcon}).addTo(map);
-                    map.addLayer(marker);
-                    markers.push(marker);
-                    $(document).trigger('ghost-alert', {lat: geo[0], lon:geo[1]});
+                    var haunting = this.getAttribute('data-haunting') === 'true';
+                    var name= this.getAttribute('data-name');
+
+                    if (haunting) {
+                        remove_marker(self, name);
+                        this.setAttribute('class', '');
+                        this.setAttribute('data-haunting', '');
+                    } else {
+                        add_marker(self, loc, name);
+                        this.setAttribute('class', 'haunting');
+                        this.setAttribute('data-haunting', 'true');
+                    }
                 })
         }
 

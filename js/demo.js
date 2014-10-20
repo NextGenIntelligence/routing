@@ -25,7 +25,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       center: [$rootScope.geobase.lat, $rootScope.geobase.lon]
   });
 
-  var ghostLocation;
+  var ghostLocations = [];
 
   var ghostIcon = L.icon({
       iconUrl: 'js/images/slimer.png',
@@ -55,7 +55,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   }).addTo(map);
   new L.Control.Zoom({ position: 'topright' }).addTo(map);
   L.control.locate({ position: 'topright', keepCurrentZoomLevel: true }).addTo(map);
-  L.control.locations({ position: 'topright', keepCurrentZoomLevel: true, ghostIcon: ghostIcon }).addTo(map);
+  L.control.locations({ position: 'topright', keepCurrentZoomLevel: true, ghostIcon: ghostIcon, map: map }).addTo(map);
 
   // Set up the hash
   var hash = new L.Hash(map);
@@ -81,7 +81,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   $rootScope.$on( 'map.dropMarker', function( ev, geo, text, icon_name, color ){
-    var marker = new L.marker(geo, {icon: walkIcon}).addTo(map);
+    var marker = new L.marker(geo, {icon: walkIcon});
     map.addLayer(marker);
     markers.push(marker);
     // marker.openPopup();
@@ -95,14 +95,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     if (ghostbusters > 0) {
       resetGhostBusters();
     }
-    if (ghostLocation) {
+    
+    if (ghostLocations) {
+      var waypoints = [L.latLng(geo.lat, geo.lon)];
+      ghostLocations.forEach(function(gLoc) {
+        waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
+      });
       $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], '', 'search');
       ghostbusters++;
       L.Routing.control({
-        waypoints: [
-          L.latLng(ghostLocation.lat, ghostLocation.lon),
-          L.latLng(geo.lat, geo.lon)
-        ],
+        waypoints: waypoints,
         geocoder: null,
         transitmode: 'foot'
       }).addTo(map);
@@ -110,16 +112,16 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   
   });
 
+  $(document).on('ghost-alert', function(e, geo) {
+    ghostLocations = geo;
+    resetGhostBusters();
+  });
+
   $(document).on('route:time_distance', function(e, td){
     var time = td.time,
         distance = td.distance;
     console.log(time) //not sure what to do with this right now
   })
-
-  $(document).on('ghost-alert', function(e, geo) {
-    ghostLocation = geo;
-    resetGhostBusters();
-  });
 
   // faking a search when query params are present
   var hash_query  = hash_params ? hash_params.q : false;
