@@ -26,6 +26,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   var ghostLocations = [];
+  var ghostBusterMode = 'foot';
 
   var ghostIcon = L.icon({
       iconUrl: 'js/images/slimer.png',
@@ -38,8 +39,15 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
   });
 
-  var walkIcon = L.icon({
-      iconUrl: 'js/images/egon.png',
+  var ghostbuster_icons = {
+    'foot': 'js/images/egon.png',
+    'bicycle': 'js/images/bike.png',
+    'car' : 'js/images/ecto1.png'
+  };
+
+  var getIcon = function(icon){
+    return L.icon({
+      iconUrl: ghostbuster_icons[icon],
       shadowUrl: 'js/images/marker-shadow.png',
 
       iconSize:     [38, 35], // size of the icon
@@ -47,7 +55,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       iconAnchor:   [22, 34], // point of the icon which will correspond to marker's location
       shadowAnchor: [4, 62],  // the same for the shadow
       popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-  });
+    });
+  };
 
   L.tileLayer('//{s}.tiles.mapbox.com/v3/randyme.jpnaac3a/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -55,7 +64,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   }).addTo(map);
   new L.Control.Zoom({ position: 'topright' }).addTo(map);
   L.control.locate({ position: 'topright', keepCurrentZoomLevel: true }).addTo(map);
-  L.control.locations({ position: 'topright', keepCurrentZoomLevel: true, ghostIcon: ghostIcon, map: map }).addTo(map);
+  L.control.locations({ position: 'topright', keepCurrentZoomLevel: true, ghostIcon: ghostIcon, map: map, ghostbuster_icons: ghostbuster_icons }).addTo(map);
 
   // Set up the hash
   var hash = new L.Hash(map);
@@ -80,8 +89,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     map.setView( geo, zoom || 8 );
   });
 
-  $rootScope.$on( 'map.dropMarker', function( ev, geo, text, icon_name, color ){
-    var marker = new L.marker(geo, {icon: walkIcon});
+  $rootScope.$on( 'map.dropMarker', function( ev, geo, mode ){
+    var marker = new L.marker(geo, {icon: getIcon(mode || 'foot')});
     map.addLayer(marker);
     markers.push(marker);
     // marker.openPopup();
@@ -101,12 +110,12 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
       ghostLocations.forEach(function(gLoc) {
         waypoints.push(L.latLng(gLoc.lat, gLoc.lon));
       });
-      $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], '', 'search');
+      $rootScope.$emit( 'map.dropMarker', [geo.lat, geo.lon], ghostBusterMode);
       ghostbusters++;
       L.Routing.control({
         waypoints: waypoints,
         geocoder: null,
-        transitmode: 'foot'
+        transitmode: ghostBusterMode
       }).addTo(map);
     }
   
@@ -114,6 +123,11 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
 
   $(document).on('ghost-alert', function(e, geo) {
     ghostLocations = geo;
+    resetGhostBusters();
+  });
+
+  $(document).on('ghost-buster-alert', function(e, mode) {
+    ghostBusterMode = mode;
     resetGhostBusters();
   });
 
