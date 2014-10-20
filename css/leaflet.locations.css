@@ -1,8 +1,7 @@
 ul.locations.shortcuts {
 	list-style: none;
 	margin: 0px;
-	padding: 3px;
-	/*width: 70px;*/
+	padding: 0px;
 }
 
 ul.locations.shortcuts li a, .leaflet-control-locations.expanded .leaflet-bar-part.leaflet-bar-part-single {
@@ -13,6 +12,7 @@ ul.locations.shortcuts li a, .leaflet-control-locations.expanded .leaflet-bar-pa
 
 ul.locations.shortcuts li a {
 	text-decoration: line-through;
+	width: 140px;
 }
 
 ul.locations.shortcuts li a.haunting {
