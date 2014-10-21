@@ -43,7 +43,7 @@ L.Control.Busters = L.Control.extend({
             var icon = this.options.ghostbuster_icons[key];
             this._transit_link = L.DomUtil.create('a', 'leaflet-bar-part leaflet-bar-part-single', container);
             this._transit_link.href = '#';
-            this._transit_link.title = this.options.strings.transit + (key === 'foot' ? ' on ' : ' on a ') + key;
+            this._transit_link.title = this.options.strings.title + (key === 'foot' ? ' on ' : ' on a ') + key;
             this._transit_link.setAttribute('class', key === 'foot' ? 'busting' : '');
             this._transit_link.setAttribute('data-ghost-buster-mode', key)
             this._transit_icon = L.DomUtil.create('img', 'ghosts', this._transit_link);
