@@ -27,13 +27,6 @@ div#route_inst {
   color: #ccc;
 }
 
-div#route_inst p {
-  height: 400px;
-  overflow: auto;
-  list-style-type: circle;
-  color: #ccc;
-  font-size: 10px;
-}
 
 div#route_inst h2,{
   display: none;
