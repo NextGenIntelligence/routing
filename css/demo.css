@@ -5,7 +5,7 @@ body {
   background-color: black;
 }
 
-#instructions h1, h4, h5, h6{
+#instructions h1, h4 {
     color:white;
 }
 
@@ -44,13 +44,6 @@ div#route_inst table td.distance {
   width:50px;
 }
 
-/*td.instruction { 
-  padding: 2px;
-}
-td.distance {
-  padding: 2px;
-}
-*/
 .ghosts {
   width:20px;
   height:20px;
