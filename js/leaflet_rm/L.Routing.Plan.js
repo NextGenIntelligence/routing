@@ -327,7 +327,7 @@
 						options.icon = icon;
 					}
 
-					m = L.marker(this._waypoints[i].latLng, options).addTo(this._map);
+					m = L.marker(this._waypoints[i].latLng, options)//.addTo(this._map);
 					if (this.options.draggableWaypoints) {
 						this._hookWaypointEvents(m, i);
 					}

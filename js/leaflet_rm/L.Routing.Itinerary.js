@@ -51,6 +51,7 @@
 			}
 
 			this.fire('routeselected', {route: this._routes[0]});
+			$(document).trigger('route:time_distance', {distance: this._formatDistance(this._routes[0].summary.total_distance), time: this._formatTime(this._routes[0].summary.total_time)});
 		},
 
 		_createItineraryTable: function(r) {
@@ -64,8 +65,8 @@
 				instr = r.instructions[i];
 				row = L.DomUtil.create('tr', '', body);
 				row.innerHTML =
-					'<td>' + this._instruction(instr, i) + '</td>' +
-					'<td>' + this._formatDistance(instr[2]) + '</td>';
+					'<td class="instruction">' + this._instruction(instr, i) + '</td>' +
+					'<td class="distance">' + this._formatDistance(instr[2]) + '</td>';
 			}
 
 			return table;

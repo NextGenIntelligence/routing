@@ -1,70 +1,64 @@
+
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<title>Routing</title>
-<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-<script src='http://api.tiles.mapbox.com/mapbox.js/v1.6.0-beta0/mapbox.js'></script>
-<script src="leaflet_rm/L.Routing.OSRM.js"></script>
-<script src="leaflet_rm/L.Routing.Line.js"></script>
-<script src="leaflet_rm/L.Routing.Itinerary.js"></script>
-<script src="leaflet_rm/L.Routing.Plan.js"></script>
-<script src="leaflet_rm/L.Routing.Control.js"></script>
-<script src="http://twitter.github.io/hogan.js/builds/2.0.0/hogan-2.0.0.js"></script>
-<script src="http://twitter.github.io/typeahead.js/releases/0.9.3/typeahead.js"></script>
-<script src="scripts.js"></script>
-<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" />
-<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css" />
-<link href='http://api.tiles.mapbox.com/mapbox.js/v1.6.0-beta0/mapbox.css' rel='stylesheet' />
-<link rel="stylesheet" href="stylesheet.css" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-</head>
-<body>
-<nav class="navbar navbar-default" role="navigation">
-  <div class="navbar-header">
-    <a class="navbar-brand" href="/routing">Routing Demo</a>
-  </div>
-</nav>
-<div class="container">
-  <div class="row">
-    <div class="col-md-4">
-      <div id="forward-form">
-        <form class="form-inline" role="form">
-          <div class="headroom">
-            <input type="search" name="start" class="form-control typeahead" id="start" placeholder="Starting Point">
-            <div class="headroom"></div>
-            <input type="search" name="end" class="form-control typeahead" id="end" placeholder="Destination">
-            <div class="headroom">
-              <div class="radio">
-                <label>
-                  <input type="radio" name="transitMode" id="car" value="car" checked> Drive
-                </label>
-              </div>
-              <div class="radio">
-                <label>
-                  <input type="radio" name="transitMode" id="bicycle" value="bicycle"> Bike
-                </label>
-              </div>
-              <div class="radio">
-                <label>
-                  <input type="radio" name="transitMode" id="foot" value="foot"> Walk
-                </label>
-              </div>
-            </div>
-            <div class="headroom footroom">
-              <input type="submit" class="btn btn-info" type="button" value="Go!" />
-            </div>
+<html data-ng-app="routing">
+  <head>
+    <title>Spooky Routes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/leaflet.awesome-markers.css">
+    <link rel="stylesheet" href="css/leaflet.locate.css" />
+    <link rel="stylesheet" href="css/leaflet.locations.css" />
+    <!--[if lt IE 9]>
+        <link rel="stylesheet" href="//rawgithub.com/domoritz/leaflet-locatecontrol/gh-pages/src/L.Control.Locate.ie.css"/>
+    <![endif]-->
+    <!--[if lte IE 8]>
+      <link href="css/leaflet.ie.css" rel="stylesheet" type="text/css" >
+    <![endif]-->
+    <link rel="stylesheet" href="css/demo.css" />
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.3/angular.min.js"></script>
+    
+    <script type="text/javascript" src="js/leaflet.js"></script>
+    <script type="text/javascript" src="js/leaflet-hash.js"></script>
+    <script type="text/javascript" src="js/leaflet.awesome-markers.js"></script>
+    <script type="text/javascript" src="js/L.Control.Locate.js" ></script>
+    <script type="text/javascript" src="js/L.Control.Locations.js" ></script>
+    <script type="text/javascript" src="js/L.Control.Busters.js" ></script>
+
+    <script src="js/leaflet_rm/L.Routing.OSRM.js"></script>
+    <script src="js/leaflet_rm/L.Routing.Line.js"></script>
+    <script src="js/leaflet_rm/L.Routing.Itinerary.js"></script>
+    <script src="js/leaflet_rm/L.Routing.Plan.js"></script>
+    <script src="js/leaflet_rm/L.Routing.Control.js"></script>
+    <script src="js/demo.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid" data-ng-controller="RouteController">
+      <div class="row">
+        <div class="col-md-3">
+          <div id="instructions">
+            <h1>Ghost Routes</h1>
+            <h4>Select your preferred method of travel (bike, car, or foot) from the panel on the right.</h4>
+            <h4>Click on the map to pick a starting point and a route to all the ghosts.</h4>
+            <h4>Remove or add ghosts by clicking on the ghost icon on the left panel.</h4>
           </div>
-        </form>
-        <div class="list-group" id="search-results"></div>
+          <div id="route_inst" ng-bind-html="renderHtml(route_instructions)">
+            
+          </div>
+
+        </div>
+
+        <div class="col-md-9">
+          <div id="map"></div>
+        </div>
       </div>
-      <div id="route_instructions"></div>
-    </div>
-    <div class="col-md-8">
-      <div id="map"></div>
-    </div>
-  </div>
-</div>
-</body>
+    </div>      
+
+    <!-- Adding a script block to post message to the parent container (think iframed demos) -->
+    <script type="text/javascript">
+      window.addEventListener("hashchange",function(){parent.postMessage(window.location.hash, "*")});
+    </script>
+  </body>
 </html>
