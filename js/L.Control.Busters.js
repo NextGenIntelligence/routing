@@ -9,7 +9,7 @@ L.Control.Busters = L.Control.extend({
         position: 'topleft',
         icon: 'glyphicon-th-list glyphicon',
         strings: {
-            title: "Ghost Buster"
+            title: "Ghostbuster"
         }
     },
 

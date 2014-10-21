@@ -5,7 +5,7 @@ body {
   background-color: black;
 }
 
-#instructions h1, h4, h5, h6, p{
+#instructions h1, h4 {
     color:white;
 }
 
@@ -24,11 +24,14 @@ body {
 div#route_inst {
   height: 400px;
   overflow: auto;
+  color: #ccc;
 }
+
 
 div#route_inst h2 {
   display: none;
 }
+
 
 div#route_inst table td.distance {
   width:50px;
