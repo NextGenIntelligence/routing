@@ -65,7 +65,7 @@
 				instr = r.instructions[i];
 				row = L.DomUtil.create('tr', '', body);
 				row.innerHTML =
-					'<td><li>' + this._instruction(instr, i) + '</li></td>' +
+					'<td>' + this._instruction(instr, i) + '</td>' +
 					'<td>' + this._formatDistance(instr[2]) + '</td>';
 			}
 
