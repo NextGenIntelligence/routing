@@ -19,7 +19,7 @@
 	L.Routing.OSRM = L.Class.extend({
 		includes: L.Mixin.Events,
 		options: {
-			serviceUrl: 'http://osrm.test.mapzen.com/',
+			serviceUrl: '//osrm.mapzen.com/',
 			geometryPrecision: 6
 		},
 
