@@ -2,23 +2,29 @@ body {
   font: 14px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 0px;
   margin: 0px;
+  background-color: black;
+}
+
+#instructions h1, h4, h5, h6, p{
+    color:white;
 }
 
 #map {
-  height: 100%;
+  height:100vh;
   width: 100%;
-  position: absolute;
+/*  position: absolute;
   background: #fff;
+  margin:0;*/
 }
 
 .leaflet-routing-container {
   background: white;
-  padding: 5px;
-  overflow: scroll;
+  overflow: scroll!important;
   width: 450px;
   height: 300px;
   display: block;
   border-radius:5px;
+  margin: 10px;
 }
 
 .leaflet-routing-container h2 {
