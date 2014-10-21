@@ -18,7 +18,9 @@ app.run(function($rootScope) {
 });
 
 app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
-    // --------- suggestions ---------
+  
+  $scope.route_instructions = '';
+
   var map = L.map('map', {
       zoom: $rootScope.geobase.zoom,
       zoomControl: false,
@@ -84,6 +86,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var resetGhostBusters = function() {
     $('svg').html('');
     $('.leaflet-routing-container.leaflet-control').remove();
+    $scope.$emit( 'resetRouteInstruction' );
     remove_markers();
     ghostbusters = 0;
   };
@@ -99,6 +102,22 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
     // marker.openPopup();
   });
   
+  $scope.renderHtml = function(html_code){
+    return $sce.trustAsHtml(html_code);
+  };
+
+  $scope.$on( 'setRouteInstruction', function( ev, instructions ) {
+    $scope.$apply(function(){
+      $scope.route_instructions = instructions;
+    });
+  });
+
+  $scope.$on( 'resetRouteInstruction', function( ev ) {
+    $scope.$apply(function(){
+      $scope.route_instructions = '';
+    });
+  });
+
   map.on('click', function(e) {
     var geo = {
       'lat': e.latlng.lat,
@@ -135,9 +154,8 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   $(document).on('route:time_distance', function(e, td){
-    var time = td.time,
-        distance = td.distance;
-    console.log(time) //not sure what to do with this right now
+    var instructions = $('.leaflet-routing-container.leaflet-control').html();
+    $scope.$emit( 'setRouteInstruction', instructions);
   });
     
 })

@@ -18,17 +18,20 @@ body {
 }
 
 .leaflet-routing-container {
-  background: white;
-  overflow: scroll!important;
-  width: 450px;
-  height: 300px;
-  display: block;
-  border-radius:5px;
-  margin: 10px;
+  display:none;
 }
 
-.leaflet-routing-container h2 {
-  display:none;
+div#route_inst {
+  height: 400px;
+  overflow: auto;
+}
+
+div#route_inst h2 {
+  display: none;
+}
+
+div#route_inst table td.distance {
+  width:50px;
 }
 
 .ghosts {
