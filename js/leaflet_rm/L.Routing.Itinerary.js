@@ -41,7 +41,7 @@
 				altDiv = L.DomUtil.create('div', 'leaflet-routing-alt' +
 					(i > 0 ? ' leaflet-routing-alt-minimized' : ''),
 					this._container);
-				altDiv.innerHTML = '<h2>' + alt.name.join(', ') + '</h2>' +
+				altDiv.innerHTML = '<h2>Directions</h2>' +
 					'<h3>' + this._formatDistance(alt.summary.total_distance) +
 					', ' + this._formatTime(alt.summary.total_time) + '</h3>';
 				L.DomEvent.addListener(altDiv, 'click', this._onAltClicked, this);
@@ -55,7 +55,7 @@
 		},
 
 		_createItineraryTable: function(r) {
-			var table = L.DomUtil.create('table', ''),
+			var table = L.DomUtil.create('table', 'table'),
 			    body = L.DomUtil.create('tbody', '', table),
 			    i,
 			    instr,
