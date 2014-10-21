@@ -29,7 +29,7 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   var ghostBusterMode = 'foot';
 
   var ghostIcon = L.icon({
-      iconUrl: 'js/images/slimer.png',
+      iconUrl: 'js/images/slimer-1.png',
       shadowUrl: 'js/images/marker-shadow.png',
 
       iconSize:     [38, 35], // size of the icon
@@ -40,9 +40,9 @@ app.controller('RouteController', function($scope, $rootScope, $sce, $http) {
   });
 
   var ghostbuster_icons = {
-    'foot': 'js/images/egon.png',
-    'bicycle': 'js/images/bike.png',
-    'car' : 'js/images/ecto1.png'
+    'foot': 'js/images/egon-1.png',
+    'bicycle': 'js/images/bike-01.png',
+    'car' : 'js/images/ecto1-1.png'
   };
 
   var getIcon = function(icon){
